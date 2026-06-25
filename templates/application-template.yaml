@@ -15,7 +15,6 @@ bindings:
 
   gcp:
     - projectId:
-      projectNumber:
       environment:
       region:
       businessCriticality:
