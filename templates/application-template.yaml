@@ -1,0 +1,21 @@
+# ==========================================================
+# Enterprise GCP Application Registry
+# Source of Truth for Application Metadata
+# ==========================================================
+
+product:
+team:
+owner:
+budgetOwner:
+organization:
+department:
+costCenter:
+
+bindings:
+
+  gcp:
+    - projectId:
+      projectNumber:
+      environment:
+      region:
+      businessCriticality:

@@ -1,0 +1,22 @@
+product: payments
+team: payments-platform
+owner: payments@company.com
+budgetOwner: finance@company.com
+organization: rba
+department: finance
+costCenter: CC1001
+
+bindings:
+
+  gcp:
+    - projectId: payments-dev
+      projectNumber: "123456789012"
+      environment: dev
+      region: europe-west2
+      businessCriticality: medium
+
+    - projectId: payments-prod
+      projectNumber: "123456789013"
+      environment: prod
+      region: europe-west2
+      businessCriticality: critical
