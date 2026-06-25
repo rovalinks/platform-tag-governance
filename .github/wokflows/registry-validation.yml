@@ -1,0 +1,39 @@
+name: Registry Validation
+
+on:
+
+  pull_request:
+
+    branches:
+      - main
+
+    paths:
+      - "registry/**"
+      - "validation/**"
+
+  workflow_dispatch:
+
+jobs:
+
+  validate:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r validation/requirements.txt
+
+      - name: Run Registry Validation
+        run: |
+          python validation/validate_registry.py
