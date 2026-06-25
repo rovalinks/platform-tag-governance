@@ -11,7 +11,7 @@ bindings:
   gcp:
     - projectId: payments-dev
       projectNumber: "123456789012"
-      environment: development
+      environment: deve
       region: europe-west2
       businessCriticality: medium
 
