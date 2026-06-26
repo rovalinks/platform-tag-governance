@@ -4,6 +4,10 @@ from googleapiclient.errors import HttpError
 
 from clients.compute import ComputeClient
 
+from config import MAX_RETRIES
+
+from config import RETRY_DELAY_SECONDS
+
 compute = ComputeClient()
 
 
@@ -44,7 +48,7 @@ def handle_compute_instance(
     # before the VM becomes readable.
     #
 
-    for attempt in range(10):
+    for attempt in range(MAX_RETRIES):
 
         try:
 
@@ -61,19 +65,26 @@ def handle_compute_instance(
             if e.resp.status == 404:
 
                 print(
-                    f"Instance not found ({attempt + 1}/10)"
+                     f"Instance not found ({attempt + 1}/{MAX_RETRIES})"
                 )
 
-                time.sleep(3)
+                time.sleep(RETRY_DELAY_SECONDS)
                 continue
 
             raise
 
     else:
 
-        raise Exception(
-            f"Instance '{instance_name}' never became available."
-        )
+        print("=" * 80)
+        print("INSTANCE NOT AVAILABLE")
+        print("=" * 80)
+        print(f"Skipping instance: {instance_name}")
+
+        return {
+            "status": "SKIPPED",
+            "reason": "Instance not found after retries",
+            "instance": instance_name,
+        }
 
     print("=" * 80)
     print("EXISTING LABELS")
