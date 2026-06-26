@@ -28,7 +28,7 @@ def receive_event():
     print("=" * 80)
     print("REGISTRY FOUND")
     print("=" * 80)
-    print(f"Application : {registry.application}")
+    print(f"Product      : {registry.product}")
     print(f"Department  : {registry.department}")
     print(f"Owner       : {registry.owner}")
     print(f"Cost Centre : {registry.cost_center}")

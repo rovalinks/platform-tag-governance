@@ -2,10 +2,11 @@ from pathlib import Path
 import yaml
 
 from models import Registry, ProjectBinding
-from exceptions import RegistryNotFound, InvalidRegistry
+from exceptions import RegistryNotFound
 
 ROOT = Path(__file__).resolve().parent
 REGISTRY_FOLDER = ROOT / "registry" / "gcp"
+
 
 class RegistryReader:
 
@@ -26,7 +27,7 @@ class RegistryReader:
                 if binding["projectId"] == project_id:
 
                     return Registry(
-                        application=data["application"],
+                        product=data["product"],
                         team=data["team"],
                         owner=data["owner"],
                         budget_owner=data["budgetOwner"],
@@ -43,4 +44,6 @@ class RegistryReader:
                         ],
                     )
 
-        raise RegistryNotFound(project_id)
+        raise RegistryNotFound(
+            f"Project '{project_id}' not found in any registry file."
+        )
