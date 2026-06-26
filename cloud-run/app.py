@@ -1,5 +1,8 @@
 from flask import Flask, request
+import inspect
+
 from registry import RegistryReader
+from models import Registry
 
 app = Flask(__name__)
 
@@ -11,14 +14,21 @@ def health():
     return "Healthy", 200
 
 
+@app.route("/debug", methods=["GET"])
+def debug():
+
+    return {
+        "registry_signature": str(inspect.signature(Registry)),
+        "registry_annotations": Registry.__annotations__,
+    }
+
+
 @app.route("/", methods=["POST"])
 def receive_event():
 
     event = request.get_json()
 
     data = event.get("data", event)
-
-    proto = data.get("protoPayload", {})
     resource = data.get("resource", {})
 
     project_id = resource.get("labels", {}).get("project_id")
@@ -29,9 +39,10 @@ def receive_event():
     print("REGISTRY FOUND")
     print("=" * 80)
     print(f"Product      : {registry.product}")
-    print(f"Department  : {registry.department}")
-    print(f"Owner       : {registry.owner}")
-    print(f"Cost Centre : {registry.cost_center}")
+    print(f"Team         : {registry.team}")
+    print(f"Department   : {registry.department}")
+    print(f"Owner        : {registry.owner}")
+    print(f"Cost Centre  : {registry.cost_center}")
     print("=" * 80)
 
     return "OK", 200
