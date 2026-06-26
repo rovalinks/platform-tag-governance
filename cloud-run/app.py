@@ -1,5 +1,8 @@
 from flask import Flask, request
 import json
+import time
+
+from googleapiclient.errors import HttpError
 
 from registry import RegistryReader
 from compute import ComputeClient
@@ -26,6 +29,18 @@ def receive_event():
     print(json.dumps(event, indent=2))
 
     data = event.get("data", event)
+
+    #
+    # Ignore the first audit event.
+    # We only process the event after the VM has finished creating.
+    #
+    operation = data.get("operation", {})
+
+    if not operation.get("last", False):
+        print("=" * 80)
+        print("Ignoring operation.first event")
+        print("=" * 80)
+        return "OK", 200
 
     resource = data.get("resource", {})
     proto = data.get("protoPayload", {})
@@ -56,11 +71,39 @@ def receive_event():
     print(f"Owner        : {registry.owner}")
     print(f"Cost Centre  : {registry.cost_center}")
 
-    existing_labels, fingerprint = compute.get_labels(
-        project_id,
-        zone,
-        instance_name,
-    )
+    #
+    # Retry because Compute Engine can take a few seconds
+    # before the instance becomes readable.
+    #
+    for attempt in range(10):
+
+        try:
+
+            existing_labels, fingerprint = compute.get_labels(
+                project_id,
+                zone,
+                instance_name,
+            )
+
+            break
+
+        except HttpError as e:
+
+            if e.resp.status == 404:
+
+                print(
+                    f"Instance not ready. Waiting... ({attempt + 1}/10)"
+                )
+
+                time.sleep(3)
+                continue
+
+            raise
+
+    else:
+        raise Exception(
+            f"Instance '{instance_name}' never became available."
+        )
 
     print("=" * 80)
     print("EXISTING LABELS")
