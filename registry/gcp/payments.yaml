@@ -9,7 +9,7 @@ costCenter: CC1001
 bindings:
 
   gcp:
-    - projectId: payments-dev
+    - projectId: project-a9c3b175-7f78-4ba6-9ad
       projectNumber: "123456789012"
       environment: dev
       region: europe-west2
