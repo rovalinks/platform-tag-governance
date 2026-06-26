@@ -1,8 +1,3 @@
-resource = event.get("resource", {})
-proto = event.get("protoPayload", {})
-
-project_id = resource.get("labels", {}).get("project_id")
-
 import time
 
 from googleapiclient.errors import HttpError
