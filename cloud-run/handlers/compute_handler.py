@@ -61,7 +61,7 @@ def handle_compute_instance(
             if e.resp.status == 404:
 
                 print(
-                    f"Instance not ready ({attempt + 1}/10)"
+                    f"Instance not found ({attempt + 1}/10)"
                 )
 
                 time.sleep(3)
