@@ -1,12 +1,13 @@
-import time
-
-from googleapiclient.errors import HttpError
-
 from clients.compute import ComputeClient
 
-from config import MAX_RETRIES
+from config import (
+    MAX_RETRIES,
+    RETRY_DELAY_SECONDS,
+)
 
-from config import RETRY_DELAY_SECONDS
+from utils.retry import retry_on_404
+from utils.labels import build_labels
+from utils.logger import banner, item
 
 compute = ComputeClient()
 
@@ -27,58 +28,35 @@ def handle_compute_instance(
     zone = parts[parts.index("zones") + 1]
     instance_name = parts[parts.index("instances") + 1]
 
-    print("=" * 80)
-    print("COMPUTE HANDLER")
-    print("=" * 80)
-    print(f"Project ID : {project_id}")
-    print(f"Zone       : {zone}")
-    print(f"Instance   : {instance_name}")
+    banner("COMPUTE HANDLER")
 
-    print("=" * 80)
-    print("REGISTRY FOUND")
-    print("=" * 80)
-    print(f"Product      : {registry.product}")
-    print(f"Team         : {registry.team}")
-    print(f"Department   : {registry.department}")
-    print(f"Owner        : {registry.owner}")
-    print(f"Cost Centre  : {registry.cost_center}")
+    item("Project", project_id)
+    item("Zone", zone)
+    item("Instance", instance_name)
 
-    #
-    # Retry because Compute Engine may take a few seconds
-    # before the VM becomes readable.
-    #
+    banner("REGISTRY")
 
-    for attempt in range(MAX_RETRIES):
+    item("Product", registry.product)
+    item("Team", registry.team)
+    item("Department", registry.department)
+    item("Owner", registry.owner)
+    item("Cost Centre", registry.cost_center)
 
-        try:
+    result = retry_on_404(
+        lambda: compute.get_labels(
+            project_id,
+            zone,
+            instance_name,
+        ),
+        retries=MAX_RETRIES,
+        sleep=RETRY_DELAY_SECONDS,
+    )
 
-            existing_labels, fingerprint = compute.get_labels(
-                project_id,
-                zone,
-                instance_name,
-            )
+    if result is None:
 
-            break
+        banner("INSTANCE NOT AVAILABLE")
 
-        except HttpError as e:
-
-            if e.resp.status == 404:
-
-                print(
-                     f"Instance not found ({attempt + 1}/{MAX_RETRIES})"
-                )
-
-                time.sleep(RETRY_DELAY_SECONDS)
-                continue
-
-            raise
-
-    else:
-
-        print("=" * 80)
-        print("INSTANCE NOT AVAILABLE")
-        print("=" * 80)
-        print(f"Skipping instance: {instance_name}")
+        item("Instance", instance_name)
 
         return {
             "status": "SKIPPED",
@@ -86,28 +64,15 @@ def handle_compute_instance(
             "instance": instance_name,
         }
 
-    print("=" * 80)
-    print("EXISTING LABELS")
-    print("=" * 80)
+    existing_labels, fingerprint = result
+
+    banner("EXISTING LABELS")
     print(existing_labels)
 
     new_labels = existing_labels.copy()
+    new_labels.update(build_labels(registry))
 
-    new_labels.update(
-        {
-            "product": registry.product.lower(),
-            "team": registry.team.lower(),
-            "department": registry.department.lower(),
-            "owner": registry.owner.lower()
-            .replace("@", "-")
-            .replace(".", "-"),
-            "costcentre": registry.cost_center.lower(),
-        }
-    )
-
-    print("=" * 80)
-    print("NEW LABELS")
-    print("=" * 80)
+    banner("NEW LABELS")
     print(new_labels)
 
     response = compute.set_labels(
@@ -118,9 +83,7 @@ def handle_compute_instance(
         fingerprint,
     )
 
-    print("=" * 80)
-    print("LABEL UPDATE RESPONSE")
-    print("=" * 80)
+    banner("LABEL UPDATE RESPONSE")
     print(response)
 
     return response

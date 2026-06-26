@@ -1,7 +1,13 @@
-from flask import Flask, request
+from flask import Flask
+from flask import request
 
-from registry import RegistryReader
 from dispatcher import Dispatcher
+from registry import RegistryReader
+
+from utils.logger import (
+    banner,
+    item,
+)
 
 app = Flask(__name__)
 
@@ -13,6 +19,7 @@ DEBUG = False
 
 @app.route("/", methods=["GET"])
 def health():
+
     return "Healthy", 200
 
 
@@ -21,31 +28,46 @@ def receive_event():
 
     event = request.get_json()
 
-    print("=" * 80)
-    print("EVENT RECEIVED")
-    print("=" * 80)
+    banner("EVENT RECEIVED")
 
     if DEBUG:
-        import json
-        print(json.dumps(event, indent=2))
 
-    data = event.get("data", event)
+        import json
+
+        print(
+            json.dumps(
+                event,
+                indent=2,
+            )
+        )
+
+    data = event.get(
+        "data",
+        event,
+    )
+
+    operation = data.get(
+        "operation",
+        {},
+    )
 
     #
     # Ignore the first Audit Log event.
-    # Process only once the operation has completed.
     #
-    operation = data.get("operation", {})
 
-    if not operation.get("last", False):
+    if not operation.get(
+        "last",
+        False,
+    ):
 
-        print("=" * 80)
-        print("Ignoring operation.first event")
-        print("=" * 80)
+        banner("IGNORING FIRST EVENT")
 
         return "OK", 200
 
-    resource = data.get("resource", {})
+    resource = data.get(
+        "resource",
+        {},
+    )
 
     project_id = resource.get(
         "labels",
@@ -54,16 +76,21 @@ def receive_event():
         "project_id",
     )
 
-    print("=" * 80)
-    print("PROJECT")
-    print("=" * 80)
-    print(f"Project ID : {project_id}")
+    banner("PROJECT")
 
-    registry = reader.find_by_project(project_id)
+    item("Project ID", project_id)
 
-    dispatcher.dispatch(
+    registry = reader.find_by_project(
+        project_id
+    )
+
+    response = dispatcher.dispatch(
         data,
         registry,
     )
+
+    banner("HANDLER RESPONSE")
+
+    print(response)
 
     return "OK", 200
