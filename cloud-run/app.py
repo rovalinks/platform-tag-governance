@@ -1,4 +1,7 @@
 from flask import Flask
+import inspect
+
+from models import Registry
 
 app = Flask(__name__)
 
@@ -10,6 +13,8 @@ def health():
 
 @app.route("/debug", methods=["GET"])
 def debug():
+
     return {
-        "status": "working"
+        "signature": str(inspect.signature(Registry)),
+        "annotations": Registry.__annotations__
     }
