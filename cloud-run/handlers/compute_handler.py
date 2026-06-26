@@ -2,7 +2,7 @@ import time
 
 from googleapiclient.errors import HttpError
 
-from compute import ComputeClient
+from clients.compute import ComputeClient
 
 compute = ComputeClient()
 

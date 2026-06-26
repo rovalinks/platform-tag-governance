@@ -1,5 +1,4 @@
 from flask import Flask, request
-import json
 
 from registry import RegistryReader
 from dispatcher import Dispatcher
@@ -8,6 +7,8 @@ app = Flask(__name__)
 
 reader = RegistryReader()
 dispatcher = Dispatcher()
+
+DEBUG = False
 
 
 @app.route("/", methods=["GET"])
@@ -21,17 +22,19 @@ def receive_event():
     event = request.get_json()
 
     print("=" * 80)
-    print("RAW EVENT")
+    print("EVENT RECEIVED")
     print("=" * 80)
-    print(json.dumps(event, indent=2))
+
+    if DEBUG:
+        import json
+        print(json.dumps(event, indent=2))
 
     data = event.get("data", event)
 
     #
     # Ignore the first Audit Log event.
-    # We only process the final event once the operation has completed.
+    # Process only once the operation has completed.
     #
-
     operation = data.get("operation", {})
 
     if not operation.get("last", False):
@@ -50,6 +53,11 @@ def receive_event():
     ).get(
         "project_id",
     )
+
+    print("=" * 80)
+    print("PROJECT")
+    print("=" * 80)
+    print(f"Project ID : {project_id}")
 
     registry = reader.find_by_project(project_id)
 

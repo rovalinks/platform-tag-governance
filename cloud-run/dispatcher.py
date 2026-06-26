@@ -15,14 +15,18 @@ class Dispatcher:
         print("=" * 80)
         print("DISPATCHER")
         print("=" * 80)
-        print(f"Resource Type : {resource_type}")
+        print(f"Resource Type    : {resource_type}")
 
         if resource_type == "gce_instance":
+
+            print("Selected Handler : Compute")
+
             return handle_compute_instance(
                 event,
                 registry,
             )
 
+        print("Selected Handler : None")
         print(f"No handler implemented for '{resource_type}'")
 
         return "IGNORED"
