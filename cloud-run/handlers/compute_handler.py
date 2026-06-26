@@ -1,8 +1,8 @@
 from clients.compute import ComputeClient
 
 from config import (
-    MAX_RETRIES,
-    RETRY_DELAY_SECONDS,
+    COMPUTE_RETRY_COUNT,
+    COMPUTE_RETRY_SLEEP,
 )
 
 from utils.retry import retry_on_404
@@ -48,8 +48,8 @@ def handle_compute_instance(
             zone,
             instance_name,
         ),
-        retries=MAX_RETRIES,
-        sleep=RETRY_DELAY_SECONDS,
+        retries=COMPUTE_RETRY_COUNT,
+        sleep=COMPUTE_RETRY_SLEEP,
     )
 
     if result is None:
