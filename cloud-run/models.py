@@ -10,13 +10,11 @@ class ProjectBinding:
 
 @dataclass
 class Registry:
-
-    application: str
+    product: str
     team: str
     owner: str
     budget_owner: str
     organisation: str
     department: str
     cost_center: str
-
     bindings: list[ProjectBinding]
