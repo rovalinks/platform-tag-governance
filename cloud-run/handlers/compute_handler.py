@@ -29,6 +29,8 @@ def handle_compute_instance(
     instance_name = parts[parts.index("instances") + 1]
 
     banner("COMPUTE HANDLER")
+    print(">>>>>>>>>>>>>>>> STORAGE HANDLER STARTED <<<<<<<<<<<<<<<<")
+    print(event)
 
     item("Project", project_id)
     item("Zone", zone)

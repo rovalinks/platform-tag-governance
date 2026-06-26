@@ -17,15 +17,31 @@ def handle_storage_bucket(
     registry,
 ):
 
+    banner("STORAGE HANDLER")
+
+    print("=" * 80)
+    print("RAW STORAGE EVENT")
+    print("=" * 80)
+    print(event)
+
     proto = event.get("protoPayload", {})
 
-    resource_name = proto.get("resourceName", "")
+    resource_name = proto.get(
+        "resourceName",
+        "",
+    )
+
+    print("=" * 80)
+    print("RESOURCE NAME")
+    print("=" * 80)
+    print(resource_name)
 
     bucket_name = resource_name.split("/")[-1]
 
-    banner("STORAGE HANDLER")
-
-    item("Bucket", bucket_name)
+    print("=" * 80)
+    print("PARSED BUCKET")
+    print("=" * 80)
+    print(bucket_name)
 
     banner("REGISTRY")
 

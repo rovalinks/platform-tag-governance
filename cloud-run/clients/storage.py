@@ -15,21 +15,62 @@ class StorageClient:
             cache_discovery=False,
         )
 
-    def get_bucket(self, bucket_name):
+    def get_bucket(
+        self,
+        bucket_name,
+    ):
 
-        return (
+        print("=" * 80)
+        print("GET BUCKET")
+        print("=" * 80)
+        print(bucket_name)
+
+        response = (
             self.storage.buckets()
-            .get(bucket=bucket_name)
+            .get(
+                bucket=bucket_name,
+            )
             .execute()
         )
 
-    def get_labels(self, bucket_name):
+        print("=" * 80)
+        print("GET BUCKET RESPONSE")
+        print("=" * 80)
+        print(response)
 
-        bucket = self.get_bucket(bucket_name)
+        return response
+
+    def get_labels(
+        self,
+        bucket_name,
+    ):
+
+        bucket = self.get_bucket(
+            bucket_name,
+        )
+
+        labels = bucket.get(
+            "labels",
+            {},
+        )
+
+        metageneration = bucket[
+            "metageneration"
+        ]
+
+        print("=" * 80)
+        print("CURRENT LABELS")
+        print("=" * 80)
+        print(labels)
+
+        print("=" * 80)
+        print("METAGENERATION")
+        print("=" * 80)
+        print(metageneration)
 
         return (
-            bucket.get("labels", {}),
-            bucket["metageneration"],
+            labels,
+            metageneration,
         )
 
     def set_labels(
@@ -43,7 +84,14 @@ class StorageClient:
             "labels": labels,
         }
 
-        return (
+        print("=" * 80)
+        print("PATCH REQUEST")
+        print("=" * 80)
+        print(f"Bucket: {bucket_name}")
+        print(f"Body: {body}")
+        print(f"Metageneration: {metageneration}")
+
+        response = (
             self.storage.buckets()
             .patch(
                 bucket=bucket_name,
@@ -52,3 +100,10 @@ class StorageClient:
             )
             .execute()
         )
+
+        print("=" * 80)
+        print("PATCH RESPONSE")
+        print("=" * 80)
+        print(response)
+
+        return response
