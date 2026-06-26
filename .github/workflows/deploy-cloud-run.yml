@@ -40,7 +40,7 @@ jobs:
         run: |
           docker build \
             -t europe-west2-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE_NAME }}:${{ github.sha }} \
-            ./cloud-run
+            .
 
       - name: Push Docker Image
         run: |

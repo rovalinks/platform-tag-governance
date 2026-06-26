@@ -2,11 +2,13 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY cloud-run/requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY cloud-run/ .
+
+COPY registry/ ./registry/
 
 CMD exec gunicorn \
   --bind :8080 \
