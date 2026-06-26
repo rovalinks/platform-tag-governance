@@ -3,21 +3,13 @@ proto = event.get("protoPayload", {})
 
 project_id = resource.get("labels", {}).get("project_id")
 
-resource_name = proto.get("resourceName", "")
-parts = resource_name.split("/")
+import time
 
-zone = parts[parts.index("zones") + 1]
-instance_name = parts[parts.index("instances") + 1]
+from googleapiclient.errors import HttpError
 
-print("=" * 80)
-print("COMPUTE HANDLER")
-print("=" * 80)
-print(f"Resource Name : {resource_name}")
-print(f"Project       : {project_id}")
-print(f"Zone          : {zone}")
-print(f"Instance      : {instance_name}")
-print(f"Operation ID  : {event.get('operation', {}).get('id')}")
-print(f"Last Event    : {event.get('operation', {}).get('last')}")
+from clients.compute import ComputeClient
+
+compute = ComputeClient()
 
 
 def handle_compute_instance(
