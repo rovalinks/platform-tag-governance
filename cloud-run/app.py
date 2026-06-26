@@ -11,10 +11,15 @@ def health():
     return "Healthy", 200
 
 
-@app.route("/debug", methods=["GET"])
+@app.route("/debug")
 def debug():
+
+    import inspect
 
     return {
         "signature": str(inspect.signature(Registry)),
-        "annotations": Registry.__annotations__
+        "annotations": {
+            k: str(v)
+            for k, v in Registry.__annotations__.items()
+        }
     }
