@@ -15,12 +15,12 @@ def retry_on_404(function, retries, sleep):
             if e.resp.status == 404:
 
                 print(
-                    f"Waiting... ({attempt+1}/{retries})"
+                    f"Resource not ready ({attempt + 1}/{retries})"
                 )
 
                 time.sleep(sleep)
+                continue
 
-            else:
-                raise
+            raise
 
-    raise Exception("Resource never became available.")
+    return None
