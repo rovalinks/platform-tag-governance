@@ -31,8 +31,8 @@ def receive_event():
     data = event.get("data", event)
 
     #
-    # Ignore the first audit event.
-    # We only process the event after the VM has finished creating.
+    # Ignore the first Audit Log event.
+    # Only process the final event once the operation has completed.
     #
     operation = data.get("operation", {})
 
@@ -72,9 +72,11 @@ def receive_event():
     print(f"Cost Centre  : {registry.cost_center}")
 
     #
-    # Retry because Compute Engine can take a few seconds
-    # before the instance becomes readable.
+    # Wait until the VM becomes readable.
     #
+    existing_labels = None
+    fingerprint = None
+
     for attempt in range(10):
 
         try:
@@ -85,14 +87,18 @@ def receive_event():
                 instance_name,
             )
 
+            print(f"Instance became available after {attempt + 1} attempt(s).")
             break
 
         except HttpError as e:
 
+            #
+            # VM not yet visible or already deleted.
+            #
             if e.resp.status == 404:
 
                 print(
-                    f"Instance not ready. Waiting... ({attempt + 1}/10)"
+                    f"Instance not ready ({attempt + 1}/10). Waiting..."
                 )
 
                 time.sleep(3)
@@ -100,10 +106,20 @@ def receive_event():
 
             raise
 
-    else:
-        raise Exception(
-            f"Instance '{instance_name}' never became available."
-        )
+    #
+    # If the VM never appeared, acknowledge the event.
+    # This prevents Eventarc from retrying forever.
+    #
+    if existing_labels is None:
+
+        print("=" * 80)
+        print("INSTANCE NOT FOUND")
+        print("=" * 80)
+        print(f"{instance_name} no longer exists.")
+        print("Acknowledging Eventarc event.")
+        print("=" * 80)
+
+        return "OK", 200
 
     print("=" * 80)
     print("EXISTING LABELS")
