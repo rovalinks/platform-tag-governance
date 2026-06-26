@@ -4,34 +4,26 @@ from google.cloud import storage
 class StorageClient:
 
     def __init__(self):
+
         self.client = storage.Client()
 
-    def get_bucket(
+    def get_bucket_labels(
         self,
-        bucket_name: str,
-    ):
-        return self.client.bucket(bucket_name)
-
-    def get_labels(
-        self,
-        bucket_name: str,
+        bucket_name,
     ):
 
-        bucket = self.get_bucket(bucket_name)
-
+        bucket = self.client.bucket(bucket_name)
         bucket.reload()
 
-        labels = bucket.labels or {}
+        return bucket.labels
 
-        return labels
-
-    def set_labels(
+    def set_bucket_labels(
         self,
-        bucket_name: str,
-        labels: dict,
+        bucket_name,
+        labels,
     ):
 
-        bucket = self.get_bucket(bucket_name)
+        bucket = self.client.bucket(bucket_name)
 
         bucket.reload()
 
@@ -40,7 +32,6 @@ class StorageClient:
         bucket.patch()
 
         return {
-            "bucket": bucket.name,
-            "labels": bucket.labels,
-            "status": "UPDATED",
+            "status": "SUCCESS",
+            "bucket": bucket_name,
         }
