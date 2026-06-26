@@ -31,7 +31,7 @@ class Dispatcher:
                 registry,
             )
 
-        if resource_type == STORAGE_BUCKET:
+        elif resource_type == STORAGE_BUCKET:
 
             return handle_storage_bucket(
                 event,

@@ -1,37 +1,54 @@
-from google.cloud import storage
+from google.auth import default
+from googleapiclient.discovery import build
 
 
 class StorageClient:
 
     def __init__(self):
 
-        self.client = storage.Client()
+        credentials, _ = default()
 
-    def get_bucket_labels(
-        self,
-        bucket_name,
-    ):
+        self.storage = build(
+            "storage",
+            "v1",
+            credentials=credentials,
+            cache_discovery=False,
+        )
 
-        bucket = self.client.bucket(bucket_name)
-        bucket.reload()
+    def get_bucket(self, bucket_name):
 
-        return bucket.labels
+        return (
+            self.storage.buckets()
+            .get(bucket=bucket_name)
+            .execute()
+        )
 
-    def set_bucket_labels(
+    def get_labels(self, bucket_name):
+
+        bucket = self.get_bucket(bucket_name)
+
+        return (
+            bucket.get("labels", {}),
+            bucket["metageneration"],
+        )
+
+    def set_labels(
         self,
         bucket_name,
         labels,
+        metageneration,
     ):
 
-        bucket = self.client.bucket(bucket_name)
-
-        bucket.reload()
-
-        bucket.labels = labels
-
-        bucket.patch()
-
-        return {
-            "status": "SUCCESS",
-            "bucket": bucket_name,
+        body = {
+            "labels": labels,
         }
+
+        return (
+            self.storage.buckets()
+            .patch(
+                bucket=bucket_name,
+                body=body,
+                ifMetagenerationMatch=metageneration,
+            )
+            .execute()
+        )
