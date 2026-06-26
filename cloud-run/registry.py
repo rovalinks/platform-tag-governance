@@ -4,9 +4,8 @@ import yaml
 from models import Registry, ProjectBinding
 from exceptions import RegistryNotFound, InvalidRegistry
 
-ROOT = Path(__file__).parent
-REGISTRY_FOLDER = ROOT.parent / "registry" / "gcp"
-
+ROOT = Path(__file__).resolve().parent
+REGISTRY_FOLDER = ROOT / "registry" / "gcp"
 
 class RegistryReader:
 

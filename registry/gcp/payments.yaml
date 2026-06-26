@@ -14,9 +14,3 @@ bindings:
       environment: dev
       region: europe-west2
       businessCriticality: medium
-
-    - projectId: payments-prod
-      projectNumber: "123456789013"
-      environment: prod
-      region: europe-west2
-      businessCriticality: critical

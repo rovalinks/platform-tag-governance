@@ -1,15 +1,37 @@
-from pathlib import Path
+from flask import Flask, request
+from registry import RegistryReader
 
-print("=" * 80)
-print("REGISTRY FILES")
-print("=" * 80)
+app = Flask(__name__)
 
-registry_path = Path(__file__).resolve().parent / "registry" / "gcp"
+reader = RegistryReader()
 
-print(registry_path)
 
-if registry_path.exists():
-    for f in registry_path.glob("*.yaml"):
-        print(f.name)
-else:
-    print("Registry folder not found")
+@app.route("/", methods=["GET"])
+def health():
+    return "Healthy", 200
+
+
+@app.route("/", methods=["POST"])
+def receive_event():
+
+    event = request.get_json()
+
+    data = event.get("data", event)
+
+    proto = data.get("protoPayload", {})
+    resource = data.get("resource", {})
+
+    project_id = resource.get("labels", {}).get("project_id")
+
+    registry = reader.find_by_project(project_id)
+
+    print("=" * 80)
+    print("REGISTRY FOUND")
+    print("=" * 80)
+    print(f"Application : {registry.application}")
+    print(f"Department  : {registry.department}")
+    print(f"Owner       : {registry.owner}")
+    print(f"Cost Centre : {registry.cost_center}")
+    print("=" * 80)
+
+    return "OK", 200
