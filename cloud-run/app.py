@@ -1,9 +1,7 @@
 from flask import Flask, request
-import logging
+import json
 
 app = Flask(__name__)
-
-logging.basicConfig(level=logging.INFO)
 
 
 @app.route("/", methods=["GET"])
@@ -16,18 +14,14 @@ def receive_event():
 
     event = request.get_json()
 
-    proto = event.get("protoPayload", {})
-    resource = event.get("resource", {})
+    print("=" * 80)
+    print("RAW EVENT")
+    print("=" * 80)
+    print(json.dumps(event, indent=2))
 
-    project_id = resource.get("labels", {}).get("project_id")
-    zone = resource.get("labels", {}).get("zone")
-    resource_name = proto.get("resourceName")
-    principal = proto.get("authenticationInfo", {}).get("principalEmail")
-
-    logging.info("========== EVENT RECEIVED ==========")
-    logging.info("Project      : %s", project_id)
-    logging.info("Zone         : %s", zone)
-    logging.info("Resource     : %s", resource_name)
-    logging.info("Created By   : %s", principal)
+    print("=" * 80)
+    print("EVENT KEYS")
+    print("=" * 80)
+    print(event.keys())
 
     return "OK", 200
