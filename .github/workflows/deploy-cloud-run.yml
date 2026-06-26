@@ -1,14 +1,7 @@
 name: Deploy Cloud Run
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "cloud-run/**"
-      - "Dockerfile"
-
-workflow_dispatch:
+  workflow_dispatch:
 
 permissions:
   contents: read
