@@ -22,27 +22,35 @@ def handle_storage_bucket(
     banner("STORAGE HANDLER")
 
     print("=" * 80)
-    print("RAW STORAGE EVENT")
+    print("STEP 1 - RAW STORAGE EVENT")
     print("=" * 80)
     print(json.dumps(event, indent=2))
 
+    print("=" * 80)
+    print("STEP 2 - GET protoPayload")
+    print("=" * 80)
+
     proto = event.get("protoPayload", {})
+
+    print(proto)
+
+    print("=" * 80)
+    print("STEP 3 - GET resourceName")
+    print("=" * 80)
 
     resource_name = proto.get(
         "resourceName",
         "",
     )
 
-    print("=" * 80)
-    print("RESOURCE NAME")
-    print("=" * 80)
     print(resource_name)
+
+    print("=" * 80)
+    print("STEP 4 - PARSE BUCKET")
+    print("=" * 80)
 
     bucket_name = resource_name.split("/")[-1]
 
-    print("=" * 80)
-    print("PARSED BUCKET")
-    print("=" * 80)
     print(bucket_name)
 
     banner("REGISTRY")
@@ -53,6 +61,10 @@ def handle_storage_bucket(
     item("Owner", registry.owner)
     item("Cost Centre", registry.cost_center)
 
+    print("=" * 80)
+    print("STEP 5 - GET EXISTING LABELS")
+    print("=" * 80)
+
     result = retry_on_404(
         lambda: storage.get_labels(
             bucket_name,
@@ -60,6 +72,9 @@ def handle_storage_bucket(
         retries=STORAGE_RETRY_COUNT,
         sleep=STORAGE_RETRY_SLEEP,
     )
+
+    print("Retry Result:")
+    print(result)
 
     if result is None:
 
@@ -74,14 +89,27 @@ def handle_storage_bucket(
 
     existing_labels, metageneration = result
 
-    banner("EXISTING LABELS")
+    print("=" * 80)
+    print("STEP 6 - EXISTING LABELS")
+    print("=" * 80)
     print(existing_labels)
 
-    new_labels = existing_labels.copy()
-    new_labels.update(build_labels(registry))
+    print("=" * 80)
+    print("STEP 7 - BUILD LABELS")
+    print("=" * 80)
 
-    banner("NEW LABELS")
+    new_labels = existing_labels.copy()
+    new_labels.update(
+        build_labels(
+            registry,
+        )
+    )
+
     print(new_labels)
+
+    print("=" * 80)
+    print("STEP 8 - PATCH BUCKET")
+    print("=" * 80)
 
     response = storage.set_labels(
         bucket_name,
@@ -89,7 +117,9 @@ def handle_storage_bucket(
         metageneration,
     )
 
-    banner("LABEL UPDATE RESPONSE")
+    print("=" * 80)
+    print("STEP 9 - PATCH RESPONSE")
+    print("=" * 80)
     print(response)
 
     return response
