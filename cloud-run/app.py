@@ -17,12 +17,6 @@ dispatcher = Dispatcher()
 DEBUG = False
 
 
-@app.route("/", methods=["GET"])
-def health():
-
-    return "Healthy", 200
-
-
 @app.route("/", methods=["POST"])
 def receive_event():
 
@@ -30,30 +24,27 @@ def receive_event():
 
     banner("EVENT RECEIVED")
 
-    if DEBUG:
+    import json
 
-        import json
-
-        print(
-            json.dumps(
-                event,
-                indent=2,
-            )
-        )
+    print("=" * 80)
+    print("FULL EVENT")
+    print("=" * 80)
+    print(json.dumps(event, indent=2))
 
     data = event.get(
         "data",
         event,
     )
 
+    print("=" * 80)
+    print("DATA")
+    print("=" * 80)
+    print(json.dumps(data, indent=2))
+
     operation = data.get(
         "operation",
         {},
     )
-
-    #
-    # Ignore the first Audit Log event.
-    #
 
     if not operation.get(
         "last",
