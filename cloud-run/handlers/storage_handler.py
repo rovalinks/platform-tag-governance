@@ -1,3 +1,5 @@
+import json
+
 from clients.storage import StorageClient
 
 from config import (
@@ -22,7 +24,7 @@ def handle_storage_bucket(
     print("=" * 80)
     print("RAW STORAGE EVENT")
     print("=" * 80)
-    print(event)
+    print(json.dumps(event, indent=2))
 
     proto = event.get("protoPayload", {})
 
