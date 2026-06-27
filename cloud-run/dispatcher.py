@@ -18,31 +18,22 @@ class Dispatcher:
     ):
 
         resource = event.get("resource", {})
-        resource_type = resource.get("type")
+        proto = event.get("protoPayload", {})
 
-        banner("DISPATCHER")
+        banner("DISPATCHER DEBUG")
 
-        item("Resource Type", resource_type)
+        print(resource)
 
-        if resource_type == COMPUTE_INSTANCE:
+        item("Resource Type", resource.get("type"))
+        item("Service", proto.get("serviceName"))
+        item("Method", proto.get("methodName"))
 
-            return handle_compute_instance(
-                event,
-                registry,
-            )
+        #
+        # TEMPORARY
+        #
+        print(">>> CALLING STORAGE HANDLER <<<")
 
-        elif resource_type == STORAGE_BUCKET:
-
-            return handle_storage_bucket(
-                event,
-                registry,
-            )
-
-        banner("NO HANDLER")
-
-        item("Resource Type", resource_type)
-
-        return {
-            "status": "IGNORED",
-            "resource_type": resource_type,
-        }
+        return handle_storage_bucket(
+            event,
+            registry,
+        )
