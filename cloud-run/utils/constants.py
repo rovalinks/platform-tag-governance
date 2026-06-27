@@ -5,3 +5,5 @@ STORAGE_BUCKET = "gcs_bucket"
 BIGQUERY_DATASET = "bigquery_dataset"
 
 PUBSUB_TOPIC = "pubsub_topic"
+
+COMPUTE_DISK = "gce_disk"
