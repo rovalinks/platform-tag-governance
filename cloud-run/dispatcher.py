@@ -1,7 +1,7 @@
 from handlers.compute_handler import handle_compute_instance
 from handlers.disk_handler import handle_compute_disk
 from handlers.snapshot_handler import handle_compute_snapshot
-# from handlers.image_handler import handle_compute_image
+from handlers.image_handler import handle_compute_image
 # from handlers.address_handler import handle_compute_address
 # from handlers.instance_template_handler import handle_compute_instance_template
 # from handlers.machine_image_handler import handle_compute_machine_image
@@ -11,6 +11,7 @@ from utils.constants import (
     COMPUTE_INSTANCE,
     COMPUTE_DISK,
     COMPUTE_SNAPSHOT,
+    COMPUTE_IMAGE
     STORAGE_BUCKET,
 )
 
@@ -50,8 +51,8 @@ class Dispatcher:
         elif resource_type == COMPUTE_SNAPSHOT:
             return handle_compute_snapshot(event, registry)
 
-        # elif resource_type == COMPUTE_IMAGE:
-        #     return handle_compute_image(event, registry)
+        elif resource_type == COMPUTE_IMAGE:
+            return handle_compute_image(event, registry)
 
         # elif resource_type == COMPUTE_ADDRESS:
         #     return handle_compute_address(event, registry)
