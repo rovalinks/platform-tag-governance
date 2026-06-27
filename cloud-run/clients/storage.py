@@ -25,6 +25,10 @@ class StorageClient:
         print("=" * 80)
         print(bucket_name)
 
+        print("=" * 80)
+        print("ABOUT TO CALL STORAGE API")
+        print("=" * 80)
+
         response = (
             self.storage.buckets()
             .get(
@@ -87,9 +91,9 @@ class StorageClient:
         print("=" * 80)
         print("PATCH REQUEST")
         print("=" * 80)
-        print(f"Bucket: {bucket_name}")
-        print(f"Body: {body}")
-        print(f"Metageneration: {metageneration}")
+        print(f"Bucket          : {bucket_name}")
+        print(f"Labels          : {labels}")
+        print(f"Metageneration  : {metageneration}")
 
         response = (
             self.storage.buckets()
