@@ -1,9 +1,9 @@
-def handle_compute_snapshot(
+def handle_compute_forwarding_rule(
     event: dict,
     registry,
 ):
 
-    print("SNAPSHOT HANDLER")
+    print("FORWARDING RULE HANDLER")
 
     return {
         "status": "NOT_IMPLEMENTED"

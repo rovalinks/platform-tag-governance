@@ -1,9 +1,9 @@
-def handle_compute_snapshot(
+def handle_compute_instance_group_manager(
     event: dict,
     registry,
 ):
 
-    print("SNAPSHOT HANDLER")
+    print("INSTANCE GROUP MANAGER HANDLER")
 
     return {
         "status": "NOT_IMPLEMENTED"
