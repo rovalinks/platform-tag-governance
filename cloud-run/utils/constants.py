@@ -1,12 +1,15 @@
 COMPUTE_INSTANCE = "gce_instance"
-COMPUTE_INSTANCE = "gce_instance"
+
 COMPUTE_DISK = "gce_disk"
+
 COMPUTE_SNAPSHOT = "gce_snapshot"
+
 COMPUTE_IMAGE = "gce_image"
+
 COMPUTE_ADDRESS = "gce_address"
+
 COMPUTE_INSTANCE_TEMPLATE = "gce_instance_template"
+
 COMPUTE_MACHINE_IMAGE = "gce_machine_image"
 
 STORAGE_BUCKET = "gcs_bucket"
-BIGQUERY_DATASET = "bigquery_dataset"
-PUBSUB_TOPIC = "pubsub_topic"
