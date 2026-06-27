@@ -1,4 +1,4 @@
-from clients.compute import ComputeClient
+from clients.disk import DiskClient
 
 from config import (
     COMPUTE_RETRY_COUNT,
@@ -9,10 +9,10 @@ from utils.retry import retry_on_404
 from utils.labels import build_labels
 from utils.logger import banner, item
 
-compute = ComputeClient()
+disk = DiskClient()
 
 
-def handle_compute_instance(
+def handle_compute_disk(
     event: dict,
     registry,
 ):
@@ -38,15 +38,15 @@ def handle_compute_instance(
         parts.index("zones") + 1
     ]
 
-    instance_name = parts[
-        parts.index("instances") + 1
+    disk_name = parts[
+        parts.index("disks") + 1
     ]
 
-    banner("COMPUTE HANDLER")
+    banner("COMPUTE DISK HANDLER")
 
     item("Project", project_id)
     item("Zone", zone)
-    item("Instance", instance_name)
+    item("Disk", disk_name)
 
     banner("REGISTRY")
 
@@ -57,10 +57,10 @@ def handle_compute_instance(
     item("Cost Centre", registry.cost_center)
 
     result = retry_on_404(
-        lambda: compute.get_labels(
+        lambda: disk.get_disk_labels(
             project_id,
             zone,
-            instance_name,
+            disk_name,
         ),
         retries=COMPUTE_RETRY_COUNT,
         sleep=COMPUTE_RETRY_SLEEP,
@@ -68,14 +68,14 @@ def handle_compute_instance(
 
     if result is None:
 
-        banner("INSTANCE NOT AVAILABLE")
+        banner("DISK NOT AVAILABLE")
 
-        item("Instance", instance_name)
+        item("Disk", disk_name)
 
         return {
             "status": "SKIPPED",
-            "reason": "Instance not found after retries",
-            "instance": instance_name,
+            "reason": "Disk not found after retries",
+            "disk": disk_name,
         }
 
     existing_labels, fingerprint = result
@@ -91,10 +91,10 @@ def handle_compute_instance(
     banner("NEW LABELS")
     print(new_labels)
 
-    response = compute.set_labels(
+    response = disk.set_disk_labels(
         project_id,
         zone,
-        instance_name,
+        disk_name,
         new_labels,
         fingerprint,
     )

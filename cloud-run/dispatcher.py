@@ -1,8 +1,10 @@
 from handlers.compute_handler import handle_compute_instance
+from handlers.disk_handler import handle_compute_disk
 from handlers.storage_handler import handle_storage_bucket
 
 from utils.constants import (
     COMPUTE_INSTANCE,
+    COMPUTE_DISK,
     STORAGE_BUCKET,
 )
 
@@ -17,23 +19,51 @@ class Dispatcher:
         registry,
     ):
 
-        resource = event.get("resource", {})
-        proto = event.get("protoPayload", {})
-
-        banner("DISPATCHER DEBUG")
-
-        print(resource)
-
-        item("Resource Type", resource.get("type"))
-        item("Service", proto.get("serviceName"))
-        item("Method", proto.get("methodName"))
-
-        #
-        # TEMPORARY
-        #
-        print(">>> CALLING STORAGE HANDLER <<<")
-
-        return handle_storage_bucket(
-            event,
-            registry,
+        resource = event.get(
+            "resource",
+            {},
         )
+
+        resource_type = resource.get(
+            "type",
+        )
+
+        banner("DISPATCHER")
+
+        item(
+            "Resource Type",
+            resource_type,
+        )
+
+        if resource_type == COMPUTE_INSTANCE:
+
+            return handle_compute_instance(
+                event,
+                registry,
+            )
+
+        elif resource_type == COMPUTE_DISK:
+
+            return handle_compute_disk(
+                event,
+                registry,
+            )
+
+        elif resource_type == STORAGE_BUCKET:
+
+            return handle_storage_bucket(
+                event,
+                registry,
+            )
+
+        banner("NO HANDLER")
+
+        item(
+            "Resource Type",
+            resource_type,
+        )
+
+        return {
+            "status": "IGNORED",
+            "resource_type": resource_type,
+        }
